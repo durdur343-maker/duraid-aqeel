@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قسم علوم الأغذية والتقانات الأحيائية - نظام إدارة الموظفين</title>
+    <meta name="description" content="نظام إدارة وبحث موظفي قسم علوم الأغذية والتقانات الأحيائية">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة jsPDF لتصدير PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #97bc62;
+            --accent-color: #ffcc00;
+            --light-color: #f4f9f4;
+            --dark-color: #1a3c1e;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* شريط العنوان */
+        header {
+            background: linear-gradient(to right, var(--dark-color), var(--primary-color));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 40px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        .department-info h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .department-info p {
+            font-size: 16px;
+            opacity: 0.9;
+            color: var(--light-color);
+        }
+        
+        .header-stats {
+            text-align: right;
+        }
+        
+        .stat-item {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        /* قسم البحث */
+        .search-section {
+            background-color: white;
+            padding: 30px;
+            margin: 20px auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            max-width: 1000px;
+        }
+        
+        .search-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark-color);
+            font-size: 24px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+            text-align: right;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(151, 188, 98, 0.2);
+        }
+        
+        .search-button {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(44, 95, 45, 0.3);
+        }
+        
+        .search-button:active {
+            transform: translateY(0);
+        }
+        
+        .search-hint {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        
+        .suggestions {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #888;
+        }
+        
+        /* نتائج البحث */
+        .results-section {
+            margin: 30px 0;
+            display: none;
+        }
+        
+        .results-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 26px;
+            position: relative;
+        }
+        
+        .results-title:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background-color: var(--secondary-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .results-info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .employee-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-right: 5px solid var(--secondary-color);
+            transition: transform 0.3s;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .employee-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .employee-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            margin-left: 20px;
+        }
+        
+        .employee-name {
+            font-size: 22px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .employee-id {
+            color: #666;
+            font-size: 15px;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 160px;
+        }
+        
+        .detail-value {
+            color: #555;
+            flex: 1;
+        }
+        
+        /* رسالة عدم وجود نتائج */
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        
+        .no-results i {
+            font-size: 60px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .no-results h3 {
+            color: #777;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        
+        .try-again {
+            margin-top: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        /* شعارات علمية */
+        .scientific-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .scientific-icon {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 32px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+        
+        .scientific-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        /* قسم عرض جميع الموظفين */
+        .all-employees {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .all-employees-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark-color);
+            font-size: 24px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .employee-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .employee-mini-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            border-right: 3px solid var(--secondary-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .employee-mini-card:hover {
+            background-color: #f0f7f0;
+            transform: translateX(-5px);
+        }
+        
+        .employee-mini-name {
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .employee-mini-position {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* تذييل الصفحة */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            color: var(--secondary-color);
+        }
+        
+        /* تأثيرات إضافية */
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loader i {
+            font-size: 30px;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* تصميم متجاوب */
+        @media (max-width: 992px) {
+            .details-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            
+            .employee-list {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .header-stats {
+                text-align: center;
+                margin-top: 15px;
+            }
+            
+            .department-info h1 {
+                font-size: 24px;
+            }
+            
+            .search-section {
+                padding: 20px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .employee-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .employee-avatar {
+                margin-left: 0;
+                margin-bottom: 15px;
+            }
+            
+            .scientific-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .detail-label {
+                min-width: auto;
+            }
+            
+            .employee-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* رسالة تحميل البيانات */
+        .data-loading {
+            text-align: center;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+        }
+        
+        /* زر البحث السريع */
+        .quick-search {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .quick-search-btn {
+            background-color: #e9f5e9;
+            border: 1px solid var(--secondary-color);
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .quick-search-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        /* إشعار */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* أزرار التحكم */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .action-btn {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .action-btn.print {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
+        }
+        
+        /* طباعة */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #print-section, #print-section * {
+                visibility: visible;
+            }
+            
+            #print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .employee-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* قسم الطباعة */
+        #print-section {
+            display: none;
+        }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .print-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+        
+        .print-title {
+            font-size: 28px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .print-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .print-date {
+            color: #888;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط العنوان -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <div class="department-info">
+                        <h1>قسم علوم الأغذية والتقانات الأحيائية</h1>
+                        <p>نظام إدارة الموارد البشرية والبحث العلمي</p>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">إجمالي الموظفين: <span id="total-employees" class="stat-value">0</span></div>
+                    <div class="stat-item">آخر تحديث: <span id="last-update" class="stat-value">الآن</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- إشعار -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i> <span id="notification-text"></span>
+    </div>
+
+    <!-- قسم البحث -->
+    <div class="container">
+        <section class="search-section">
+            <h2 class="search-title">نظام البحث عن موظفين القسم</h2>
+            
+            <div class="search-box">
+                <div class="search-input-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="اكتب اسم الموظف للبحث...">
+                </div>
+                
+                <div class="quick-search">
+                    <span>ابحث سريعاً:</span>
+                    <button class="quick-search-btn" onclick="quickSearch('محمد')">محمد</button>
+                    <button class="quick-search-btn" onclick="quickSearch('سارة')">سارة</button>
+                    <button class="quick-search-btn" onclick="quickSearch('عبدالله')">عبدالله</button>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button id="search-button" class="search-button">
+                        <i class="fas fa-search"></i> بحث
+                    </button>
+                    
+                    <button id="show-all-button" class="search-button" style="background: linear-gradient(to right, #4a6fa5, #6b93d6);">
+                        <i class="fas fa-list"></i> عرض الجميع
+                    </button>
+                </div>
+            </div>
+            
+            <div class="search-hint">
+                <p>اكتب أي جزء من اسم الموظف للبحث في قاعدة البيانات | البيانات متصلة مباشرة بملف Google Sheet</p>
+            </div>
+            
+            <!-- أزرار التحكم -->
+            <div class="action-buttons">
+                <button id="pdf-button" class="action-btn" onclick="exportToPDF()">
+                    <i class="fas fa-file-pdf"></i> حفظ بصيغة PDF
+                </button>
+                <button id="print-button" class="action-btn print" onclick="printResults()">
+                    <i class="fas fa-print"></i> طباعة النتائج
+                </button>
+            </div>
+            
+            <!-- مؤشر التحميل -->
+            <div id="loader" class="loader">
+                <i class="fas fa-spinner"></i>
+                <p>جاري البحث...</p>
+            </div>
+            
+            <!-- رسالة تحميل البيانات -->
+            <div id="data-loading" class="data-loading">
+                <p><i class="fas fa-database"></i> جاري تحميل بيانات الموظفين...</p>
+            </div>
+        </section>
+        
+        <!-- شعارات علمية -->
+        <div class="scientific-icons">
+            <div class="scientific-icon" title="المجهر البحثي">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <div class="scientific-icon" title="المختبر العلمي">
+                <i class="fas fa-flask"></i>
+            </div>
+            <div class="scientific-icon" title="البحث الجيني">
+                <i class="fas fa-dna"></i>
+            </div>
+            <div class="scientific-icon" title="الزراعة الحديثة">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="scientific-icon" title="التحاليل المخبرية">
+                <i class="fas fa-vial"></i>
+            </div>
+        </div>
+        
+        <!-- قسم النتائج -->
+        <section id="results-section" class="results-section">
+            <h2 class="results-title">نتائج البحث</h2>
+            <div class="results-info">
+                تم العثور على <span id="results-count">0</span> نتيجة
+            </div>
+            <div id="results-container"></div>
+        </section>
+        
+        <!-- قسم عرض جميع الموظفين -->
+        <section id="all-employees-section" class="all-employees" style="display: none;">
+            <h2 class="all-employees-title">جميع موظفي القسم</h2>
+            <div id="all-employees-container" class="employee-list"></div>
+        </section>
+        
+        <!-- رسالة عدم وجود نتائج -->
+        <div id="no-results" class="no-results">
+            <i class="fas fa-search-minus"></i>
+            <h3>لم يتم العثور على نتائج</h3>
+            <div class="try-again" onclick="showAllEmployees()">عرض جميع الموظفين</div>
+        </div>
+    </div>
+    
+    <!-- قسم الطباعة (مخفي) -->
+    <div id="print-section">
+        <div class="print-header">
+            <div class="print-logo">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <h1 class="print-title">قسم علوم الأغذية والتقانات الأحيائية</h1>
+            <p class="print-subtitle">نتائج البحث عن الموظفين</p>
+            <p class="print-subtitle" id="print-search-term"></p>
+            <p class="print-date" id="print-date"></p>
+        </div>
+        <div id="print-results-container"></div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <p>قسم علوم الأغذية والتقانات الأحيائية</p>
+                <p>نظام إدارة الموارد البشرية © <span id="current-year"></span></p>
+                <p style="font-size: 14px; opacity: 0.8;">تم التطوير باستخدام HTML, CSS, JavaScript</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات الموظفين
+        let employees = [];
+        let realEmployeeCount = 0;
+        let currentResults = []; // لتخزين نتائج البحث الحالية
+        
+        // عناصر DOM
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const showAllButton = document.getElementById('show-all-button');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContainer = document.getElementById('results-container');
+        const allEmployeesSection = document.getElementById('all-employees-section');
+        const allEmployeesContainer = document.getElementById('all-employees-container');
+        const noResults = document.getElementById('no-results');
+        const loader = document.getElementById('loader');
+        const dataLoading = document.getElementById('data-loading');
+        const resultsCount = document.getElementById('results-count');
+        const totalEmployees = document.getElementById('total-employees');
+        const lastUpdate = document.getElementById('last-update');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const currentYearElement = document.getElementById('current-year');
+        const printSearchTerm = document.getElementById('print-search-term');
+        const printDateElement = document.getElementById('print-date');
+        const printResultsContainer = document.getElementById('print-results-container');
+        
+        // تحديث التاريخ
+        function updateDate() {
+            const now = new Date();
+            currentYearElement.textContent = now.getFullYear();
+            
+            const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            lastUpdate.textContent = timeString;
+            
+            // تحديث تاريخ الطباعة
+            printDateElement.textContent = `تاريخ الطباعة: ${dateString} - الساعة: ${timeString}`;
+        }
+        
+        // عرض إشعار
+        function showNotification(message, type = 'info') {
+            notificationText.textContent = message;
+            notification.style.display = 'block';
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = 'var(--primary-color)';
+            } else if (type === 'warning') {
+                notification.style.backgroundColor = '#ff9800';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#f44336';
+            }
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // جلب البيانات من Google Sheet
+        async function fetchEmployeeData() {
+            try {
+                dataLoading.style.display = 'block';
+                
+                const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxuV3idtU0Tqa6hQrc6tP_0MkDCBgxz9kYGEnVQ8Xf7yXfQOQ5tRtX3_t6kO8szf1ZBeGiS4LyHacr/pub?gid=0&single=true&output=csv';
+                
+                const response = await fetch(googleSheetURL + '&t=' + new Date().getTime());
+                
+                if (!response.ok) throw new Error('خطأ في الاتصال بالبيانات');
+                
+                const csvData = await response.text();
+                employees = parseCSV(csvData);
+                realEmployeeCount = employees.length;
+                
+                updateEmployeeCount();
+                dataLoading.style.display = 'none';
+                showNotification(`✅ تم تحميل ${realEmployeeCount} موظف`, 'success');
+                
+            } catch (error) {
+                console.error('خطأ:', error);
+                // بيانات تجريبية
+                employees = [
+                    { 
+                        "الرمز الوظيفي": "FST-001",
+                        "القسم": "مركز الأبحاث",
+                        "تاريخ التعيين": "01/01/2020",
+                        "الحالة": "مستمر",
+                        "الاسم الكامل": "محمد أحمد حسين",
+                        "الدرجة الوظيفية": "باحث رئيسي",
+                        "الشهادة العلمية": "دكتوراه في علوم الأغذية",
+                        "التخصص": "بحوث الأغذية المتقدمة",
+                        "البريد الإلكتروني": "m.ahmed@fst.edu",
+                        "رقم الهاتف": "0555010101",
+                        "المشاريع البحثية": "5 مشاريع نشطة",
+                        "المنشورات العلمية": "12 بحث منشور",
+                        "الدورات التدريبية": "8 دورات متخصصة"
+                    },
+                    { 
+                        "الرمز الوظيفي": "FST-002",
+                        "القسم": "مركز الأبحاث",
+                        "تاريخ التعيين": "22/07/2019",
+                        "الحالة": "مستمر",
+                        "الاسم الكامل": "سارة خالد الوهيبي",
+                        "الدرجة الوظيفية": "أستاذ مشارك",
+                        "الشهادة العلمية": "دكتوراه في التقانات الأحيائية",
+                        "التخصص": "التقانات الأحيائية الدقيقة",
+                        "البريد الإلكتروني": "s.khaled@fst.edu",
+                        "رقم الهاتف": "0555010202",
+                        "المشاريع البحثية": "7 مشاريع نشطة",
+                        "المنشورات العلمية": "18 بحث منشور",
+                        "الدورات التدريبية": "12 دورة متخصصة"
+                    },
+                    { 
+                        "الرمز الوظيفي": "FST-003",
+                        "القسم": "مركز الجودة",
+                        "تاريخ التعيين": "10/11/2020",
+                        "الحالة": "مستمر",
+                        "الاسم الكامل": "عبدالله محمد القحطاني",
+                        "الدرجة الوظيفية": "فني مختبر أول",
+                        "الشهادة العلمية": "ماجستير في الكيمياء الحيوية",
+                        "التخصص": "مراقبة الجودة",
+                        "البريد الإلكتروني": "a.mohammed@fst.edu",
+                        "رقم الهاتف": "0555010303",
+                        "المشاريع البحثية": "3 مشاريع نشطة",
+                        "المنشورات العلمية": "5 أبحاث منشورة",
+                        "الدورات التدريبية": "6 دورات متخصصة"
+                    }
+                ];
+                realEmployeeCount = employees.length;
+                updateEmployeeCount();
+                dataLoading.style.display = 'none';
+                showNotification(`⚠️ استخدام بيانات تجريبية (${realEmployeeCount} موظف)`, 'warning');
+            }
+        }
+        
+        // تحليل CSV
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const employee = {};
+                
+                for (let j = 0; j < headers.length; j++) {
+                    employee[headers[j]] = values[j] || '';
+                }
+                
+                // إضافة إذا كان لديه اسم في العمود الخامس
+                if (employee[headers[4]] && employee[headers[4]].trim() !== '') {
+                    data.push(employee);
+                }
+            }
+            
+            return data;
+        }
+        
+        // تحديث العداد
+        function updateEmployeeCount() {
+            totalEmployees.textContent = realEmployeeCount;
+            updateDate();
+        }
+        
+        // البحث السريع
+        function quickSearch(name) {
+            searchInput.value = name;
+            searchEmployees();
+        }
+        
+        // البحث
+        function searchEmployees() {
+            const query = searchInput.value.trim().toLowerCase();
+            
+            if (!query) {
+                showNotification('⚠️ الرجاء إدخال اسم للبحث', 'warning');
+                return;
+            }
+            
+            loader.style.display = 'block';
+            resultsSection.style.display = 'none';
+            noResults.style.display = 'none';
+            allEmployeesSection.style.display = 'none';
+            
+            setTimeout(() => {
+                const results = employees.filter(employee => {
+                    // البحث في جميع الحقول النصية
+                    for (const key in employee) {
+                        const value = employee[key] || '';
+                        if (value.toLowerCase().includes(query)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                
+                currentResults = results; // حفظ النتائج الحالية
+                displayResults(results);
+                loader.style.display = 'none';
+                
+                if (results.length > 0) {
+                    showNotification(`🔍 تم العثور على ${results.length} نتيجة`, 'success');
+                } else {
+                    showNotification('❌ لم يتم العثور على نتائج', 'error');
+                }
+            }, 300);
+        }
+        
+        // عرض النتائج
+        function displayResults(results) {
+            resultsContainer.innerHTML = '';
+            
+            if (results.length === 0) {
+                noResults.style.display = 'block';
+                resultsCount.textContent = '0';
+                return;
+            }
+            
+            resultsSection.style.display = 'block';
+            noResults.style.display = 'none';
+            resultsCount.textContent = results.length;
+            
+            results.forEach(employee => {
+                const card = createEmployeeCard(employee);
+                resultsContainer.appendChild(card);
+            });
+        }
+        
+        // إنشاء بطاقة موظف
+        function createEmployeeCard(employee) {
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            
+            // استخراج الاسم من العمود الخامس أو أي عمود آخر
+            const nameField = Object.keys(employee)[4] || Object.keys(employee)[0];
+            const fullName = employee[nameField] || 'غير محدد';
+            const firstLetter = fullName.charAt(0) || 'م';
+            
+            let detailsHTML = '';
+            for (const key in employee) {
+                if (employee[key] && employee[key].trim() !== '') {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <span class="detail-label">${key}:</span>
+                            <span class="detail-value">${employee[key]}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            card.innerHTML = `
+                <div class="employee-header">
+                    <div class="employee-avatar">${firstLetter}</div>
+                    <div>
+                        <h3 class="employee-name">${fullName}</h3>
+                        <p class="employee-id">${Object.keys(employee)[0]}: ${employee[Object.keys(employee)[0]] || ''}</p>
+                    </div>
+                </div>
+                <div class="details-grid">
+                    ${detailsHTML}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // إنشاء بطاقة موظف للطباعة
+        function createPrintEmployeeCard(employee) {
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.style.border = '1px solid #ddd';
+            card.style.padding = '15px';
+            card.style.marginBottom = '20px';
+            card.style.pageBreakInside = 'avoid';
+            
+            // استخراج الاسم من العمود الخامس أو أي عمود آخر
+            const nameField = Object.keys(employee)[4] || Object.keys(employee)[0];
+            const fullName = employee[nameField] || 'غير محدد';
+            
+            let detailsHTML = '';
+            let counter = 0;
+            for (const key in employee) {
+                if (employee[key] && employee[key].trim() !== '' && counter < 15) { // تحديد 15 حقل كحد أقصى للطباعة
+                    detailsHTML += `
+                        <div style="display: flex; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px dashed #eee;">
+                            <span style="font-weight: bold; color: #2c5f2d; min-width: 150px;">${key}:</span>
+                            <span style="color: #555; flex: 1;">${employee[key]}</span>
+                        </div>
+                    `;
+                    counter++;
+                }
+            }
+            
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #97bc62;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #2c5f2d, #97bc62); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-left: 15px;">
+                        ${fullName.charAt(0) || 'م'}
+                    </div>
+                    <div>
+                        <h3 style="font-size: 18px; color: #1a3c1e; margin-bottom: 5px;">${fullName}</h3>
+                        <p style="color: #666; font-size: 14px;">${Object.keys(employee)[0]}: ${employee[Object.keys(employee)[0]] || ''}</p>
+                    </div>
+                </div>
+                <div>
+                    ${detailsHTML}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // تصدير إلى PDF
+        async function exportToPDF() {
+            if (currentResults.length === 0) {
+                showNotification('⚠️ لا توجد نتائج للتصدير', 'warning');
+                return;
+            }
+            
+            showNotification('📄 جاري إنشاء ملف PDF...', 'info');
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            
+            let yPosition = 20;
+            const margin = 20;
+            const lineHeight = 7;
+            
+            // إضافة شعار القسم
+            doc.setFillColor(44, 95, 45);
+            doc.circle(pageWidth / 2, yPosition, 8, 'F');
+            doc.setFontSize(14);
+            doc.setTextColor(255, 255, 255);
+            doc.text('🔬', pageWidth / 2, yPosition + 2.5, { align: 'center' });
+            
+            yPosition += 15;
+            
+            // عنوان التقرير
+            doc.setTextColor(44, 95, 45);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('قسم علوم الأغذية والتقانات الأحيائية', pageWidth / 2, yPosition, { align: 'center' });
+            
+            yPosition += 10;
+            
+            // معلومات التقرير
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('نتائج البحث عن الموظفين', pageWidth / 2, yPosition, { align: 'center' });
+            
+            yPosition += 8;
+            
+            // مصطلح البحث
+            const searchTerm = searchInput.value || 'جميع الموظفين';
+            doc.text(`مصطلح البحث: ${searchTerm}`, pageWidth / 2, yPosition, { align: 'center' });
+            
+            yPosition += 8;
+            
+            // تاريخ التقرير
+            const now = new Date();
+            const dateString = now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+            doc.text(`تاريخ التقرير: ${dateString} - ${timeString}`, pageWidth / 2, yPosition, { align: 'center' });
+            
+            yPosition += 15;
+            
+            // ملخص النتائج
+            doc.setTextColor(44, 95, 45);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`عدد النتائج: ${currentResults.length} موظف`, margin, yPosition);
+            
+            yPosition += 10;
+            
+            // تفاصيل الموظفين
+            doc.setDrawColor(151, 188, 98);
+            doc.setLineWidth(0.5);
+            doc.line(margin, yPosition, pageWidth - margin, yPosition);
+            
+            yPosition += 15;
+            
+            currentResults.forEach((employee, index) => {
+                // التحقق من المساحة قبل إضافة موظف جديد
+                if (yPosition > pageHeight - 50) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                // اسم الموظف
+                const nameField = Object.keys(employee)[4] || Object.keys(employee)[0];
+                const fullName = employee[nameField] || 'غير محدد';
+                
+                doc.setTextColor(26, 60, 30);
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${index + 1}. ${fullName}`, margin, yPosition);
+                
+                yPosition += 8;
+                
+                // الرمز الوظيفي
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                const idKey = Object.keys(employee)[0];
+                doc.text(`${idKey}: ${employee[idKey] || ''}`, margin, yPosition);
+                
+                yPosition += 8;
+                
+                // المعلومات المهمة
+                const importantFields = ['الدرجة الوظيفية', 'القسم', 'الشهادة العلمية', 'التخصص', 'البريد الإلكتروني', 'رقم الهاتف'];
+                
+                importantFields.forEach(field => {
+                    if (employee[field] && employee[field].trim() !== '') {
+                        doc.text(`- ${field}: ${employee[field]}`, margin + 5, yPosition);
+                        yPosition += 6;
+                        
+                        // التحقق من المساحة
+                        if (yPosition > pageHeight - 20) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+                    }
+                });
+                
+                yPosition += 10;
+                
+                // خط فاصل بين الموظفين
+                if (index < currentResults.length - 1) {
+                    doc.setDrawColor(200, 200, 200);
+                    doc.setLineWidth(0.2);
+                    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+                    yPosition += 15;
+                }
+            });
+            
+            // إضافة تذييل الصفحة
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text('نظام إدارة الموارد البشرية - قسم علوم الأغذية والتقانات الأحيائية', pageWidth / 2, pageHeight - 10, { align: 'center' });
+            doc.text(`الصفحة ${doc.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+            
+            // حفظ الملف
+            const fileName = `نتائج_البحث_${searchTerm.replace(/[^\w\u0600-\u06FF]/g, '_')}_${now.getTime()}.pdf`;
+            doc.save(fileName);
+            
+            showNotification('✅ تم إنشاء ملف PDF بنجاح', 'success');
+        }
+        
+        // طباعة النتائج
+        function printResults() {
+            if (currentResults.length === 0) {
+                showNotification('⚠️ لا توجد نتائج للطباعة', 'warning');
+                return;
+            }
+            
+            showNotification('🖨️ جاري تجهيز الطباعة...', 'info');
+            
+            // تحديث قسم الطباعة
+            printSearchTerm.textContent = `مصطلح البحث: ${searchInput.value || 'جميع الموظفين'}`;
+            updateDate();
+            
+            // تفريغ وعرض النتائج في قسم الطباعة
+            printResultsContainer.innerHTML = '';
+            
+            currentResults.forEach(employee => {
+                const printCard = createPrintEmployeeCard(employee);
+                printResultsContainer.appendChild(printCard);
+            });
+            
+            // إعداد خيارات الطباعة
+            const printContent = document.getElementById('print-section').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>طباعة نتائج البحث - قسم علوم الأغذية</title>
+                    <style>
+                        @media print {
+                            @page {
+                                size: A4;
+                                margin: 20mm;
+                            }
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                line-height: 1.6;
+                                color: #333;
+                            }
+                            .employee-card {
+                                border: 1px solid #ddd;
+                                border-right: 5px solid #97bc62;
+                                padding: 15px;
+                                margin-bottom: 20px;
+                                page-break-inside: avoid;
+                                border-radius: 5px;
+                            }
+                        }
+                        .no-print {
+                            display: none;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function() {
+                                window.close();
+                            }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            // طباعة ثم استعادة المحتوى الأصلي
+            setTimeout(() => {
+                document.body.innerHTML = originalContent;
+                showNotification('✅ تم إعداد الطباعة بنجاح', 'success');
+                
+                // إعادة ربط الأحداث
+                initializeEvents();
+            }, 500);
+        }
+        
+        // عرض جميع الموظفين
+        function showAllEmployees() {
+            allEmployeesContainer.innerHTML = '';
+            resultsSection.style.display = 'none';
+            noResults.style.display = 'none';
+            allEmployeesSection.style.display = 'block';
+            
+            currentResults = employees; // حفظ كنتائج حالية
+            
+            employees.forEach(employee => {
+                const nameField = Object.keys(employee)[4] || Object.keys(employee)[0];
+                const fullName = employee[nameField] || 'غير محدد';
+                const positionField = Object.keys(employee)[5] || '';
+                const position = employee[positionField] || '';
+                
+                const card = document.createElement('div');
+                card.className = 'employee-mini-card';
+                card.onclick = () => {
+                    searchInput.value = fullName;
+                    searchEmployees();
+                };
+                
+                card.innerHTML = `
+                    <div class="employee-mini-name">${fullName}</div>
+                    <div class="employee-mini-position">${position}</div>
+                `;
+                
+                allEmployeesContainer.appendChild(card);
+            });
+        }
+        
+        // إعادة تهيئة الأحداث بعد الطباعة
+        function initializeEvents() {
+            searchButton.addEventListener('click', searchEmployees);
+            showAllButton.addEventListener('click', showAllEmployees);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchEmployees();
+            });
+        }
+        
+        // أحداث الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            fetchEmployeeData();
+            
+            initializeEvents();
+        });
+    </script>
+</body>
+</html>
