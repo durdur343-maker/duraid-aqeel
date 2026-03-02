@@ -16,7 +16,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
         :root {
             --primary-color: #2c5f2d;
             --secondary-color: #97bc62;
@@ -26,20 +25,17 @@
             --text-color: #333;
             --border-color: #ddd;
         }
-        
         body {
             background-color: #f9f9f9;
             color: var(--text-color);
             line-height: 1.6;
             padding-bottom: 20px;
         }
-        
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
         }
-        
         /* شريط العنوان */
         header {
             background: linear-gradient(to right, var(--dark-color), var(--primary-color));
@@ -50,20 +46,17 @@
             overflow: hidden;
             margin-bottom: 20px;
         }
-        
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
         }
-        
         .logo-section {
             display: flex;
             align-items: center;
             gap: 20px;
         }
-        
         .logo {
             width: 80px;
             height: 80px;
@@ -1368,16 +1361,13 @@
                     searchInput.value = fullName;
                     searchEmployees();
                 };
-                
                 card.innerHTML = `
                     <div class="employee-mini-name">${fullName}</div>
                     <div class="employee-mini-position">${position}</div>
                 `;
-                
                 allEmployeesContainer.appendChild(card);
             });
         }
-        
         // إعادة تهيئة الأحداث بعد الطباعة
         function initializeEvents() {
             searchButton.addEventListener('click', searchEmployees);
@@ -1386,7 +1376,7 @@
                 if (e.key === 'Enter') searchEmployees();
             });
         }
-        
+    
         // أحداث الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             updateDate();
